@@ -18,6 +18,12 @@ border-radius (clip)          CORNER_WARP_RADIUS (warp)
    corners lost                  corners kept
 ```
 
+Examples:
+
+<img width="541" height="273" alt="maximum-tension1" src="https://github.com/user-attachments/assets/d975beac-cea7-4dcd-af00-db5396357bcd" />
+
+<img width="803" height="420" alt="maximum-tension" src="https://github.com/user-attachments/assets/d524d8c5-4976-4bb4-8495-ee1496aae3d6" />
+
 ---
 
 ## How it works
