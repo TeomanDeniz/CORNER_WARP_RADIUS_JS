@@ -32,8 +32,7 @@ Examples:
 
 Everything happens in one fragment shader, once per pixel.
 
-For a pixel `P` inside the rounded rectangle, the shader casts a ray from the
-centre through `P` and asks two questions:
+For a pixel `p` inside the rounded rectangle, the shader casts a ray from the centre through `p` and asks two questions:
 
 1. **Where does that ray cross the rounded boundary?** (`t_round`) - found with a 22-step binary search against a rounded-box signed-distance function.
 2. **Where would it cross the original *square* boundary?** (`t_square`)
@@ -51,7 +50,7 @@ scale = mix(1, 1 + (t_square/t_round - 1) * G, strength)
 - `f > outer` -> `g = 1` -> full warp held flat to the edge (the *plateau*)
 - between them -> a ramp shaped by `CURVE` (`<1` concave, `1` linear, `>1` convex)
 
-The corner shape itself is an **n-norm**: `N = 2` gives circular arcs, `N ≈ 4` an iOS-style squircle, higher `N` a squarer corner. The rounded edge is anti-aliased against the SDF, and output is premultiplied alpha so it composites cleanly over any background.
+The corner shape itself is an **n-norm**: `n = 2` gives circular arcs, `n ≈ 4` an iOS-style squircle, higher `n` a squarer corner. The rounded edge is anti-aliased against the SDF, and output is premultiplied alpha so it composites cleanly over any background.
 
 ---
 
@@ -134,7 +133,7 @@ Draws one frame from an explicit parameter object. Pure: it reads no DOM and has
 
 ### `detect_border_inset(src?)` -> `{w, inner, thin}`
 
-Measures the thickness of a solid frame around the artwork. Defaults to `CURRENT_SOURCE` if no source is passed. It draws the image into a 256×256 buffer (same cover-fit as the shader), then from five points along each edge walks inward from the edge colour until the colour changes. A run counts as a real frame only if it is near-constant **and** ends at a sharp step - this rejects gradients and photos that merely darken toward the edge. The median run across all edges resists a logo crossing one side.
+Measures the thickness of a solid frame around the artwork. Defaults to `CURRENT_SOURCE` if no source is passed. It draws the image into a 256x256 buffer (same cover-fit as the shader), then from five points along each edge walks inward from the edge colour until the colour changes. A run counts as a real frame only if it is near-constant **and** ends at a sharp step - this rejects gradients and photos that merely darken toward the edge. The median run across all edges resists a logo crossing one side.
 
 | Field   | Meaning                                                             |
 | ------- | ------------------------------------------------------------------- |
@@ -142,29 +141,29 @@ Measures the thickness of a solid frame around the artwork. Defaults to `CURRENT
 | `inner` | `1 - w` - the band edge to set so the warp is confined to the frame |
 | `thin`  | `true` when no clear frame was found (fall back to a default)       |
 
-Typical use: set both `INNER` and `OUTER` to `INNER` for a step that lands exactly on the frame's inner line, hiding the warp seam in an edge that already exists.
+Typical use: set both `inner` and `outer` to `inner` for a step that lands exactly on the frame's inner line, hiding the warp seam in an edge that already exists.
 
 ### Helpers
 
-- `GET(id)` - `document.getElementById` shorthand.
-- `UNIFORM(name)` / `SHADER(type, source)` - internal GL helpers, exposed for extension.
+- `get(id)` - `document.getElementById` shorthand.
+- `uniform(name)` / `shader(type, source)` - internal GL helpers, exposed for extension.
 
-### State (read-only after `USE`)
+### State (read-only after `use`)
 
-`DOM` (canvas), `GL` (context), `PROGRAM`, `TEX` (texture), `ASPECT`, `CURRENT_SOURCE`, and the `VS` / `FS` shader sources.
+`dom` (canvas), `gl` (context), `program`, `tex` (texture), `aspect`, `current_source`, and the `vs` / `fs` shader sources.
 
 ---
 
 ## Shader uniforms
 
-Set for you by `RENDER`; listed for anyone editing the shader.
+Set for you by `render`; listed for anyone editing the shader.
 
 | Uniform                         | Source                                         |
 | ------------------------------- | ---------------------------------------------- |
 | `U_R`, `U_N`                    | radius, corner shape                           |
 | `U_STRENGTH`                    | warp amount                                    |
 | `U_INNER`, `U_OUTER`, `U_CURVE` | band profile                                   |
-| `U_ASPECT`                      | `ASPECT`, for cover-fit of non-square images   |
+| `U_ASPECT`                      | `aspect`, for cover-fit of non-square images   |
 | `U_PIX`                         | `2 / canvas.height`, the edge anti-alias width |
 | `U_TEX`                         | the source texture (unit 0)                    |
 
@@ -172,8 +171,8 @@ Set for you by `RENDER`; listed for anyone editing the shader.
 
 ## Notes & gotchas
 
- - **Draw at ≥ 2× display size.** Corners compress pixels, so the internal canvas (e.g. `960×960` for a `320px` tile) keeps them crisp.
- - **Premultiplied alpha.** The context is created with `premultipliedAlpha: true` and blends `ONE, ONE_MINUS_SRC_ALPHA`. Keep that if you change the blend setup.
- - **Reading pixels needs same-origin images.** `DETECT_BORDER_INSET` calls `getImageData`; a cross-origin image without CORS will taint the canvas and throw. Local files, blob URLs, and canvases are fine.
- - **The warp is corner-concentrated by design.** `SCALE` is `1.0` along the flat edges and only exceeds it near the corners, which is what keeps a centred grid square. If you ever want uniform inward compression all the way around, that's a different mapping.
- - **Detection tuning.** The main knob is `THRESH` (colour-departure sensitivity, `55` on a `0..765` scale) inside `DETECT_BORDER_INSET`: raise it if busy frames read as too thin, lower it if soft frames get missed.
+ - **Draw at >= 2x display size.** Corners compress pixels, so the internal canvas (e.g. `960x960` for a `320px` tile) keeps them crisp.
+ - **Premultiplied alpha.** The context is created with `premultipliedAlpha: true` and blends `one, one_minus_src_alpha`. Keep that if you change the blend setup.
+ - **Reading pixels needs same-origin images.** `detect_border_inset` calls `getImageData`; a cross-origin image without CORS will taint the canvas and throw. Local files, blob URLs, and canvases are fine.
+ - **The warp is corner-concentrated by design.** `scale` is `1.0` along the flat edges and only exceeds it near the corners, which is what keeps a centred grid square. If you ever want uniform inward compression all the way around, that's a different mapping.
+ - **Detection tuning.** The main knob is `thresh` (colour-departure sensitivity, `55` on a `0..765` scale) inside `detect_border_inset`: raise it if busy frames read as too thin, lower it if soft frames get missed.
