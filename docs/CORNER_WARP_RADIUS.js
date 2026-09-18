@@ -1,293 +1,305 @@
-const	CORNER_WARP_RADIUS = {
-	DOM: null,
-	GL: null,
-	PROGRAM: null,
-	TEX: null,
-	ASPECT: 1,
-	CURRENT_SOURCE: null,
-	VS:
-	`
-		attribute vec2	A_POSITION;
-		varying vec2	V_UV;
-		void
-			main()
-		{
-			V_UV = A_POSITION * 0.5 + 0.5; gl_Position = vec4(A_POSITION, 0.0, 1.0);
-		}
-	`,
-	FS:
-	`
-		precision highp		float;
-		varying vec2		V_UV;
-		uniform sampler2D	U_TEX;
-		uniform float		U_R;
-		uniform float		U_N;
-		uniform float		U_STRENGTH;
-		uniform float		U_INNER;
-		uniform float		U_OUTER;
-		uniform float		U_CURVE;
-		uniform float		U_PIX;
-		uniform float		U_ASPECT;
+/******************************************************************************\
+# JS - corner_warp_radius                        #       Maximum Tension       #
+################################################################################
+#                                                #      -__            __-     #
+# Teoman Deniz                                   #  :    :!1!-_    _-!1!:    : #
+# maximum-tension.com                            #  ::                      :: #
+#                                                #  :!:    : :: : :  :  ::::!: #
+# +.....................++.....................+ #   :!:: :!:!1:!:!::1:::!!!:  #
+# : C - Maximum Tension :: Create - 2016/01/24 : #   ::!::!!1001010!:!11!!::   #
+# :---------------------::---------------------: #   :!1!!11000000000011!!:    #
+# : License - MIT       :: Update - 2026/09/18 : #    ::::!!!1!!1!!!1!!!::     #
+# +.....................++.....................+ #       ::::!::!:::!::::      #
+\******************************************************************************/
 
-		float
-			LEN_N(vec2 VECTOR, float VALUE)
-		{
-			VECTOR = max(VECTOR, 0.0);
-			return (pow(pow(VECTOR.x, VALUE) + pow(VECTOR.y, VALUE), 1.0 / VALUE));
-		}
-
-		float
-			SD_BOX(vec2 POSITION, float RADIUS, float VALUE)
-		{
-			vec2	Q = abs(POSITION) - (1.0 - RADIUS);
-
-			return (LEN_N(Q, VALUE) + min(max(Q.x, Q.y), 0.0) - RADIUS);
-		}
-
-		float
-			HIT(vec2 DIR, float RADIUS, float VALUE)
-		{
-			float	LO = 0.0;
-			float	HI = 2.0;
-
-			for (int _ = 0; _ < 22; _++)
-			{
-				float	MID = 0.5 * (LO + HI);
-
-				if (SD_BOX(DIR * MID, RADIUS, VALUE) < 0.0)
-					LO = MID;
-				else
-					HI = MID;
-			}
-
-			return (0.5 * (LO + HI));
-		}
-
-		void
-			main()
-		{
-			vec2	P = V_UV * 2.0 - 1.0;
-			float	D = SD_BOX(P, U_R, U_N);
-			float	T = length(P);
-			vec2	DIR = T > 1E-4 ? P / T : vec2(1.0, 0.0);
-			float	T_SQUARE = 1.0 / max(max(abs(DIR.x), abs(DIR.y)), 1E-4);
-			float	T_ROUND = HIT(DIR, U_R, U_N);
-			float	F = T / T_ROUND;
-			float	K = T_SQUARE / T_ROUND;
-			float	BAND = clamp((F - U_INNER) / max(U_OUTER - U_INNER, 1E-4), 0.0, 1.0);
-			float	G = pow(BAND, U_CURVE);
-			float	SCALE = mix(1.0, 1.0 + (K - 1.0) * G, U_STRENGTH);
-			vec2	SRC = DIR * T * SCALE;
-			vec2	ST = clamp(SRC * 0.5 + 0.5, 0.0, 1.0);
-
-			if (U_ASPECT > 1.0)
-				ST.x = 0.5 + (ST.x - 0.5) / U_ASPECT;
-			else
-				ST.y = 0.5 + (ST.y - 0.5) * U_ASPECT;
-
-			vec4	C = texture2D(U_TEX, ST);
-
-			C.a *= 1.0 - smoothstep(-U_PIX, U_PIX, D);
-			gl_FragColor = vec4(C.rgb * C.a, C.a);
-		}
-	`,
-	USE: function (ELEMENT)
+const	corner_warp_radius = {
+	dom: null,
+	gl: null,
+	program: null,
+	tex: null,
+	aspect: 1,
+	current_source: null,
+	vs: "attribute vec2	A_POSITION;" +
+		"varying vec2	V_UV;" +
+		"void" +
+		"	main()" +
+		"{" +
+		"	V_UV = A_POSITION * 0.5 + 0.5; gl_Position = vec4(A_POSITION, 0.0, 1.0);" +
+		"}",
+	fs: "precision highp		float;" +
+		"varying vec2		V_UV;" +
+		"uniform sampler2D	U_TEX;" +
+		"uniform float		U_R;" +
+		"uniform float		U_N;" +
+		"uniform float		U_STRENGTH;" +
+		"uniform float		U_INNER;" +
+		"uniform float		U_OUTER;" +
+		"uniform float		U_CURVE;" +
+		"uniform float		U_PIX;" +
+		"uniform float		U_ASPECT;" +
+		"" +
+		"float" +
+		"	LEN_N(vec2 VECTOR, float VALUE)" +
+		"{" +
+		"	VECTOR = max(VECTOR, 0.0);" +
+		"	return (pow(pow(VECTOR.x, VALUE) + pow(VECTOR.y, VALUE), 1.0 / VALUE));" +
+		"}" +
+		"	" +
+		"float" +
+		"	SD_BOX(vec2 POSITION, float RADIUS, float VALUE)" +
+		"{" +
+		"	vec2	Q = abs(POSITION) - (1.0 - RADIUS);" +
+		"	" +
+		"	return (LEN_N(Q, VALUE) + min(max(Q.x, Q.y), 0.0) - RADIUS);" +
+		"}" +
+		"	" +
+		"float" +
+		"	HIT(vec2 DIR, float RADIUS, float VALUE)" +
+		"{" +
+		"	float	LO = 0.0;" +
+		"	float	HI = 2.0;" +
+		"	" +
+		"	for (int _ = 0; _ < 22; _++)" +
+		"	{" +
+		"		float	MID = 0.5 * (LO + HI);" +
+		"	" +
+		"		if (SD_BOX(DIR * MID, RADIUS, VALUE) < 0.0)" +
+		"			LO = MID;" +
+		"		else" +
+		"			HI = MID;" +
+		"	}" +
+		"	" +
+		"	return (0.5 * (LO + HI));" +
+		"}" +
+		"	" +
+		"void" +
+		"	main()" +
+		"{" +
+		"	vec2	P = V_UV * 2.0 - 1.0;" +
+		"	float	D = SD_BOX(P, U_R, U_N);" +
+		"	float	T = length(P);" +
+		"	vec2	DIR = T > 1E-4 ? P / T : vec2(1.0, 0.0);" +
+		"	float	T_SQUARE = 1.0 / max(max(abs(DIR.x), abs(DIR.y)), 1E-4);" +
+		"	float	T_ROUND = HIT(DIR, U_R, U_N);" +
+		"	float	F = T / T_ROUND;" +
+		"	float	K = T_SQUARE / T_ROUND;" +
+		"	float	BAND = clamp((F - U_INNER) / max(U_OUTER - U_INNER, 1E-4), 0.0, 1.0);" +
+		"	float	G = pow(BAND, U_CURVE);" +
+		"	float	SCALE = mix(1.0, 1.0 + (K - 1.0) * G, U_STRENGTH);" +
+		"	vec2	SRC = DIR * T * SCALE;" +
+		"	vec2	ST = clamp(SRC * 0.5 + 0.5, 0.0, 1.0);" +
+		"	" +
+		"	if (U_ASPECT > 1.0)" +
+		"		ST.x = 0.5 + (ST.x - 0.5) / U_ASPECT;" +
+		"	else" +
+		"		ST.y = 0.5 + (ST.y - 0.5) * U_ASPECT;" +
+		"	" +
+		"	vec4	C = texture2D(U_TEX, ST);" +
+		"	" +
+		"	C.a *= 1.0 - smoothstep(-U_PIX, U_PIX, D);" +
+		"	gl_FragColor = vec4(C.rgb * C.a, C.a);" +
+		"}",
+	use: function(element)
 	{
-		if (typeof(ELEMENT) === "string")
-			ELEMENT = document.getElementById(ELEMENT);
+		if (typeof(element) === "string")
+			element = document.getElementById(element);
 
-		if (!ELEMENT)
+		if (!element)
 			return (1);
 
-		const	CWR = CORNER_WARP_RADIUS;
+		const	cwr = corner_warp_radius;
 
-		CWR.DOM = ELEMENT;
-		CWR.GL =
-			CWR.DOM.getContext("webgl2", {premultipliedAlpha: true, antialias: false}) ||
-			CWR.DOM.getContext("webgl", {premultipliedAlpha: true, antialias: false});
+		cwr.dom = element;
+		cwr.gl =
+			cwr.dom.getContext("webgl2", {premultipliedAlpha: true, antialias: false}) ||
+			cwr.dom.getContext("webgl", {premultipliedAlpha: true, antialias: false});
 
-		if (!CWR.GL)
+		if (!cwr.gl)
 			return (2);
 
-		CWR.PROGRAM = CWR.GL.createProgram();
+		cwr.program = cwr.gl.createProgram();
 
-		if (!CWR.PROGRAM)
+		if (!cwr.program)
 			return (3);
 
-		CWR.GL.attachShader(CWR.PROGRAM, CWR.SHADER(CWR.GL.VERTEX_SHADER, CWR.VS));
-		CWR.GL.attachShader(CWR.PROGRAM, CWR.SHADER(CWR.GL.FRAGMENT_SHADER, CWR.FS));
-		CWR.GL.linkProgram(CWR.PROGRAM);
+		cwr.gl.attachShader(cwr.program, cwr.shader(cwr.gl.VERTEX_SHADER, cwr.vs));
+		cwr.gl.attachShader(cwr.program, cwr.shader(cwr.gl.FRAGMENT_SHADER, cwr.fs));
+		cwr.gl.linkProgram(cwr.program);
 
-		if (!CWR.GL.getProgramParameter(CWR.PROGRAM, CWR.GL.LINK_STATUS))
+		if (!cwr.gl.getProgramParameter(cwr.program, cwr.gl.LINK_STATUS))
 			return (4);
 
-		CWR.GL.useProgram(CWR.PROGRAM);
-		CWR.GL.bindBuffer(CWR.GL.ARRAY_BUFFER, CWR.GL.createBuffer());
-		CWR.GL.bufferData(CWR.GL.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), CWR.GL.STATIC_DRAW);
+		cwr.gl.useProgram(cwr.program);
+		cwr.gl.bindBuffer(cwr.gl.ARRAY_BUFFER, cwr.gl.createBuffer());
+		cwr.gl.bufferData(cwr.gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), cwr.gl.STATIC_DRAW);
 
-		const	LOCATION = CWR.GL.getAttribLocation(CWR.PROGRAM, "A_POSITION");
+		const	location = cwr.gl.getAttribLocation(cwr.program, "A_POSITION");
 
-		CWR.GL.enableVertexAttribArray(LOCATION);
-		CWR.GL.vertexAttribPointer(LOCATION, 2, CWR.GL.FLOAT, false, 0, 0);
-		CWR.TEX = CWR.GL.createTexture();
-		CWR.GL.bindTexture(CWR.GL.TEXTURE_2D, CWR.TEX);
-		CWR.GL.pixelStorei(CWR.GL.UNPACK_FLIP_Y_WEBGL, true);
-		CWR.GL.texParameteri(CWR.GL.TEXTURE_2D, CWR.GL.TEXTURE_WRAP_S, CWR.GL.CLAMP_TO_EDGE);
-		CWR.GL.texParameteri(CWR.GL.TEXTURE_2D, CWR.GL.TEXTURE_WRAP_T, CWR.GL.CLAMP_TO_EDGE);
-		CWR.GL.texParameteri(CWR.GL.TEXTURE_2D, CWR.GL.TEXTURE_MIN_FILTER, CWR.GL.LINEAR);
-		CWR.GL.texParameteri(CWR.GL.TEXTURE_2D, CWR.GL.TEXTURE_MAG_FILTER, CWR.GL.LINEAR);
-		CWR.GL.enable(CWR.GL.BLEND);
-		CWR.GL.blendFunc(CWR.GL.ONE, CWR.GL.ONE_MINUS_SRC_ALPHA);
+		cwr.gl.enableVertexAttribArray(location);
+		cwr.gl.vertexAttribPointer(location, 2, cwr.gl.FLOAT, false, 0, 0);
+		cwr.tex = cwr.gl.createTexture();
+		cwr.gl.bindTexture(cwr.gl.TEXTURE_2D, cwr.tex);
+		cwr.gl.pixelStorei(cwr.gl.UNPACK_FLIP_Y_WEBGL, true);
+		cwr.gl.texParameteri(cwr.gl.TEXTURE_2D, cwr.gl.TEXTURE_WRAP_S, cwr.gl.CLAMP_TO_EDGE);
+		cwr.gl.texParameteri(cwr.gl.TEXTURE_2D, cwr.gl.TEXTURE_WRAP_T, cwr.gl.CLAMP_TO_EDGE);
+		cwr.gl.texParameteri(cwr.gl.TEXTURE_2D, cwr.gl.TEXTURE_MIN_FILTER, cwr.gl.LINEAR);
+		cwr.gl.texParameteri(cwr.gl.TEXTURE_2D, cwr.gl.TEXTURE_MAG_FILTER, cwr.gl.LINEAR);
+		cwr.gl.enable(cwr.gl.BLEND);
+		cwr.gl.blendFunc(cwr.gl.ONE, cwr.gl.ONE_MINUS_SRC_ALPHA);
 		return (0);
 	},
-	SHADER: function (TYPE, SOURCE)
+	shader: function(type, source)
 	{
-		const	CWR = CORNER_WARP_RADIUS;
-		const	__SHADER__ = CWR.GL.createShader(TYPE);
+		const	cwr = corner_warp_radius;
+		const	__shader__ = cwr.gl.createShader(type);
 
-		CWR.GL.shaderSource(__SHADER__, SOURCE);
-		CWR.GL.compileShader(__SHADER__);
+		cwr.gl.shaderSource(__shader__, source);
+		cwr.gl.compileShader(__shader__);
 
-		if (!CWR.GL.getShaderParameter(__SHADER__, CWR.GL.COMPILE_STATUS))
-			throw new Error(CWR.GL.getShaderInfoLog(__SHADER__));
+		if (!cwr.gl.getShaderParameter(__shader__, cwr.gl.COMPILE_STATUS))
+			throw new Error(cwr.gl.getShaderInfoLog(__shader__));
 
-		return (__SHADER__);
+		return (__shader__);
 	},
-	UNIFORM: function (KEY)
+	uniform: function(key)
 	{
-		const	CWR = CORNER_WARP_RADIUS;
+		const	cwr = corner_warp_radius;
 
-		return (CWR.GL.getUniformLocation(CWR.PROGRAM, KEY));
+		return (cwr.gl.getUniformLocation(cwr.program, key));
 	},
-	LOAD: function (IMAGE)
+	load: function(image)
 	{
-		const	CWR = CORNER_WARP_RADIUS;
+		const	cwr = corner_warp_radius;
 
-		CWR.CURRENT_SOURCE = IMAGE;
-		CWR.ASPECT = (IMAGE.width || IMAGE.videoWidth) / (IMAGE.height || IMAGE.videoHeight);
-		CWR.GL.bindTexture(CWR.GL.TEXTURE_2D, CWR.TEX);
-		CWR.GL.texImage2D(CWR.GL.TEXTURE_2D, 0, CWR.GL.RGBA, CWR.GL.RGBA, CWR.GL.UNSIGNED_BYTE, IMAGE);
+		cwr.current_source = image;
+		cwr.aspect = (image.width || image.videoWidth) / (image.height || image.videoHeight);
+		cwr.gl.bindTexture(cwr.gl.TEXTURE_2D, cwr.tex);
+		cwr.gl.texImage2D(cwr.gl.TEXTURE_2D, 0, cwr.gl.RGBA, cwr.gl.RGBA, cwr.gl.UNSIGNED_BYTE, image);
 	},
-	GET: function (ID)
+	get: function(id)
 	{
-		return (document.getElementById(ID));
+		return (document.getElementById(id));
 	},
-	DETECT_BORDER_INSET: function (SRC)
+	detect_border_inset: function(src)
 	{
-		const	CWR = CORNER_WARP_RADIUS;
+		const	cwr = corner_warp_radius;
 
-		if (!SRC)
-			SRC = CWR.CURRENT_SOURCE;
+		if (!src)
+			src = cwr.current_source;
 
-		if (!SRC)
-			return ({W: 0, INNER: 1, THIN: true});
+		if (!src)
+			return ({w: 0, inner: 1, thin: true});
 
 		function
-			DIFF(A, B)
+			diff(a, b)
 		{
 			return (
-				Math.abs(A[0] - B[0]) +
-				Math.abs(A[1] - B[1]) +
-				Math.abs(A[2] - B[2])
+				Math.abs(a[0] - b[0]) +
+				Math.abs(a[1] - b[1]) +
+				Math.abs(a[2] - b[2])
 			);
 		}
 
 		function
-			WALK(REFERENCE, _, MAX, READ)
+			walk(reference, _, max, read)
 		{
-			let	RESULT = 0;
+			let	result = 0;
 
-			while (RESULT < MAX && DIFF(READ(RESULT), REFERENCE) < THRESH)
-				++RESULT;
+			while (result < max && diff(read(result), reference) < thresh)
+				++result;
 
-			return (RESULT);
+			return (result);
 		}
 
 		function
-			SOLID(REFERENCE, RUN, READ)
+			solid(reference, run, read)
 		{
 			return (
-				RUN >= 3 && RUN < LIMIT &&
-				DIFF(READ(RUN - 1), REFERENCE) < THRESH * 1.4 &&
-				DIFF(READ(RUN), REFERENCE) > THRESH * 1.6
+				run >= 3 && run < limit &&
+				diff(read(run - 1), reference) < thresh * 1.4 &&
+				diff(read(run), reference) > thresh * 1.6
 			);
 		}
 
 		function
-			PX(X, Y)
+			px(x, y)
 		{
-			const	J = ((Y * N + X) << 2);
+			const	j = ((y * n + x) << 2);
 
-			return ([D[J], D[J + 1], D[J + 2]]);
+			return ([d[j], d[j + 1], d[j + 2]]);
 		}
 
-		const	N = 256;
-		const	OC = document.createElement("canvas");
+		const	n = 256;
+		const	oc = document.createElement("canvas");
 
-		OC.width = N;
-		OC.height = N;
+		oc.width = n;
+		oc.height = n;
 
-		const	OX = OC.getContext("2d", {willReadFrequently: true});
-		const	IW = SRC.width || SRC.videoWidth;
-		const	IH = SRC.height || SRC.videoHeight;
-		const	S = Math.max(N / IW, N / IH);
+		const	ox = oc.getContext("2d", {willReadFrequently: true});
+		const	iw = src.width || src.videoWidth;
+		const	ih = src.height || src.videoHeight;
+		const	s = Math.max(n / iw, n / ih);
 
-		OX.drawImage(SRC, (N - IW * S) / 2, (N - IH * S) / 2, IW * S, IH * S);
+		ox.drawImage(src, (n - iw * s) / 2, (n - ih * s) / 2, iw * s, ih * s);
 
-		const	D = OX.getImageData(0, 0, N, N).data;
-		const	THRESH = 55;
-		const	LIMIT = N * 0.45;
-		const	OFFSETS = [0.5, 0.3, 0.7, 0.18, 0.82];
-		const	RUNS = [];
+		const	d = ox.getImageData(0, 0, n, n).data;
+		const	thresh = 55;
+		const	limit = n * 0.45;
+		const	offsets = [0.5, 0.3, 0.7, 0.18, 0.82];
+		const	runs = [];
 
-		for (const OFFSET of OFFSETS)
+		for (const offset of offsets)
 		{
-			const	P = Math.round(OFFSET * (N - 1));
-			let		R;
+			const	p = Math.round(offset * (n - 1));
+			let		r;
 
-			R = WALK(PX(0, P), 1, LIMIT, function (K) {return (PX(K, P));});
-			if (SOLID(PX(0, P), R, function (K) {return (PX(K, P));}))
-				RUNS.push(R);
+			r = walk(px(0, p), 1, limit, function(k){return (px(k, p));});
 
-			R = WALK(PX(N - 1, P), 1, LIMIT, function (K) {return (PX(N - 1 - K, P));});
-			if (SOLID(PX(N - 1, P), R, function (K) {return (PX(N - 1 - K, P));}))
-				RUNS.push(R);
+			if (solid(px(0, p), r, function(k){return (px(k, p));}))
+				runs.push(r);
 
-			R = WALK(PX(P, 0), 1, LIMIT, function (K) {return (PX(P, K));});
-			if (SOLID(PX(P, 0), R, function (K) {return (PX(P, K));}))
-				RUNS.push(R);
+			r = walk(px(n - 1, p), 1, limit, function(k){return (px(n - 1 - k, p));});
 
-			R = WALK(PX(P, N - 1), 1, LIMIT, function (K) {return (PX(P, N - 1 - K));});
-			if (SOLID(PX(P, N - 1), R, function (K) {return (PX(P, N - 1 - K));}))
-				RUNS.push(R);
+			if (solid(px(n - 1, p), r, function(k){return (px(n - 1 - k, p));}))
+				runs.push(r);
+
+			r = walk(px(p, 0), 1, limit, function(k){return (px(p, k));});
+
+			if (solid(px(p, 0), r, function(k){return (px(p, k));}))
+				runs.push(r);
+
+			r = walk(px(p, n - 1), 1, limit, function(k){return (px(p, n - 1 - k));});
+
+			if (solid(px(p, n - 1), r, function(k){return (px(p, n - 1 - k));}))
+				runs.push(r);
 		}
 
-		if (RUNS.length < 4)
-			return ({W: 0, INNER: 1, THIN: true});
+		if (runs.length < 4)
+			return ({w: 0, inner: 1, thin: true});
 
-		RUNS.sort(function (A, B) {return (A - B);});
+		runs.sort(function(a, b){return (a - b);});
 
-		const	MEDIAN = RUNS[RUNS.length >> 1];
-		const	W = (2 * MEDIAN) / N;
+		const	median = runs[runs.length >> 1];
+		const	w = (2 * median) / n;
 
-		return ({W: W, INNER: 1 - W, THIN: MEDIAN < 3});
+		return ({w: w, inner: 1 - w, thin: median < 3});
 	},
-	RENDER: function (PARAMETERS)
+	render: function(parameters)
 	{
-		const	CWR = CORNER_WARP_RADIUS;
+		const	cwr = corner_warp_radius;
 
-		CWR.GL.viewport(0, 0, CWR.DOM.width, CWR.DOM.height);
-		CWR.GL.clearColor(0, 0, 0, 0);
-		CWR.GL.clear(CWR.GL.COLOR_BUFFER_BIT);
-		CWR.GL.uniform1f(CWR.UNIFORM("U_R"), PARAMETERS.R);
-		CWR.GL.uniform1f(CWR.UNIFORM("U_N"), PARAMETERS.N);
-		CWR.GL.uniform1f(CWR.UNIFORM("U_STRENGTH"), PARAMETERS.STRENGTH);
-		CWR.GL.uniform1f(CWR.UNIFORM("U_INNER"), PARAMETERS.INNER);
-		CWR.GL.uniform1f(CWR.UNIFORM("U_OUTER"), PARAMETERS.OUTER);
-		CWR.GL.uniform1f(CWR.UNIFORM("U_CURVE"), PARAMETERS.CURVE);
-		CWR.GL.uniform1f(CWR.UNIFORM("U_PIX"), 2.0 / CWR.DOM.height);
-		CWR.GL.uniform1f(CWR.UNIFORM("U_ASPECT"), CWR.ASPECT);
-		CWR.GL.uniform1i(CWR.UNIFORM("U_TEX"), 0);
-		CWR.GL.drawArrays(CWR.GL.TRIANGLES, 0, 3);
+		cwr.gl.viewport(0, 0, cwr.dom.width, cwr.dom.height);
+		cwr.gl.clearColor(0, 0, 0, 0);
+		cwr.gl.clear(cwr.gl.COLOR_BUFFER_BIT);
+		cwr.gl.uniform1f(cwr.uniform("U_R"), parameters.r);
+		cwr.gl.uniform1f(cwr.uniform("U_N"), parameters.n);
+		cwr.gl.uniform1f(cwr.uniform("U_STRENGTH"), parameters.strength);
+		cwr.gl.uniform1f(cwr.uniform("U_INNER"), parameters.inner);
+		cwr.gl.uniform1f(cwr.uniform("U_OUTER"), parameters.outer);
+		cwr.gl.uniform1f(cwr.uniform("U_CURVE"), parameters.curve);
+		cwr.gl.uniform1f(cwr.uniform("U_PIX"), 2.0 / cwr.dom.height);
+		cwr.gl.uniform1f(cwr.uniform("U_ASPECT"), cwr.aspect);
+		cwr.gl.uniform1i(cwr.uniform("U_TEX"), 0);
+		cwr.gl.drawArrays(cwr.gl.TRIANGLES, 0, 3);
 	}
 };

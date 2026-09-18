@@ -1,4 +1,29 @@
 <!DOCTYPE html>
+<!--#################################-->
+<!--#        Maximum Tension        #-->
+<!--#################################-->
+<!--#\ \ \ \-__\ \ \ \ \ \ __- \ \ \#-->
+<!--# \ : \ \:!1!-_ \ \_-!1!: \ \:\ #-->
+<!--#\ \:: \ \ \ \ \ \ \ \ \ \ \:: \#-->
+<!--# \ :!: \ \:\:: : : \:\ ::::!:\ #-->
+<!--#\ \ :!:: :!:!1:!:!::1:::!!!:\ \#-->
+<!--# \ \::!::!!1001010!:!11!!::\ \ #-->
+<!--#\ \ :!1!!11000000000011!!:\ \ \#-->
+<!--# \ \ ::::!!!1!!1!!!1!!!::\ \ \ #-->
+<!--#\ \ \ \ ::::!::!:::!::::\ \ \ \#-->
+<!--#################################-->
+<!--# . . . Page: index . . . . . . #-->
+<!--# Programmer: Teoman Deniz. . . #-->
+<!--#_______________________________#-->
+<!--#| Copyright | Maximum Tension |#-->
+<!--#|___________|_________________|#-->
+<!--#|   License | MIT             |#-->
+<!--#|___________|_________________|#-->
+<!--#|    Create | 2016/11/02      |#-->
+<!--#|___________|_________________|#-->
+<!--#|    Update | 2026/09/18      |#-->
+<!--#|___________|_________________|#-->
+<!--#################################-->
 <html lang="en">
  <head>
  <meta charset="utf-8">
@@ -13,7 +38,7 @@
   <div class="wrap">
    <div class="stage">
     <figure>
-     <img id="CLIPPED" class="art" alt="Artwork with corners clipped by border-radius">
+     <img id="clipped" class="art" alt="Artwork with corners clipped by border-radius">
      <figcaption>border-radius (clipped)</figcaption>
     </figure>
     <figure>
@@ -23,38 +48,38 @@
    </div>
    <div class="panel">
     <label>
-     <span class="row"><span>Radius</span><span class="val" id="VR">28%</span></span>
-     <input id="R" type="range" min="0" max="0.98" step="0.01" value="0.28">
+     <span class="row"><span>Radius</span><span class="val" id="vr">28%</span></span>
+     <input id="r" type="range" min="0" max="0.98" step="0.01" value="0.28">
     </label>
     <label>
-     <span class="row"><span>Corner shape</span><span class="val" id="VN">4.0</span></span>
-     <input id="N" type="range" min="2" max="8" step="0.1" value="4">
+     <span class="row"><span>Corner shape</span><span class="val" id="vn">4.0</span></span>
+     <input id="n" type="range" min="2" max="8" step="0.1" value="4">
     </label>
     <label>
-     <span class="row"><span>Warp amount</span><span class="val" id="VS">100%</span></span>
-     <input id="S" type="range" min="0" max="1" step="0.01" value="1">
+     <span class="row"><span>Warp amount</span><span class="val" id="vs">100%</span></span>
+     <input id="s" type="range" min="0" max="1" step="0.01" value="1">
     </label>
     <label>
-     <span class="row"><span>Band inner edge</span><span class="val" id="VI">45%</span></span>
-     <input id="I" type="range" min="0" max="1" step="0.01" value="0.45">
+     <span class="row"><span>Band inner edge</span><span class="val" id="vi">45%</span></span>
+     <input id="i" type="range" min="0" max="1" step="0.01" value="0.45">
     </label>
     <label>
-     <span class="row"><span>Band outer edge / plateau</span><span class="val" id="VO">85%</span></span>
-     <input id="O" type="range" min="0" max="1" step="0.01" value="0.85">
+     <span class="row"><span>Band outer edge / plateau</span><span class="val" id="vo">85%</span></span>
+     <input id="o" type="range" min="0" max="1" step="0.01" value="0.85">
     </label>
     <label>
-     <span class="row"><span>Ramp curve</span><span class="val" id="VC">linear</span></span>
-     <input id="C" type="range" min="0.25" max="4" step="0.05" value="1">
+     <span class="row"><span>Ramp curve</span><span class="val" id="vc">linear</span></span>
+     <input id="c" type="range" min="0.25" max="4" step="0.05" value="1">
     </label>
-    <canvas id="GRAPH" width="264" height="72" aria-label="Warp profile from centre to edge"></canvas>
-    <button id="AUTO_FIT">◳ Auto-fit border</button>
+    <canvas id="graph" width="264" height="72" aria-label="Warp profile from centre to edge"></canvas>
+    <button id="auto_fit">◳ Auto-fit border</button>
     <p class="status" id="status">Detects the frame thickness and sets the band to warp just that ring.</p>
     <div class="imgs">
      <button data-img="0">Framed</button>
      <button data-img="1">Grid</button>
      <button data-img="2">Photo-ish</button>
     </div>
-    <input id="FILE" type="file" accept="image/*">
+    <input id="file" type="file" accept="image/*">
     <p class="note">Radius 2 = circular corners, 4 ~ iOS squircle. "Warp starts at" keeps the middle of the image untouched - only the outer band gets squeezed inward.</p>
    </div>
   </div>

@@ -1,267 +1,293 @@
-const	GRAPH = CORNER_WARP_RADIUS.GET("GRAPH");
-const	GX = GRAPH.getContext("2d");
+/******************************************************************************\
+# JS - script                                    #       Maximum Tension       #
+################################################################################
+#                                                #      -__            __-     #
+# Teoman Deniz                                   #  :    :!1!-_    _-!1!:    : #
+# maximum-tension.com                            #  ::                      :: #
+#                                                #  :!:    : :: : :  :  ::::!: #
+# +.....................++.....................+ #   :!:: :!:!1:!:!::1:::!!!:  #
+# : C - Maximum Tension :: Create - 2026/07/12 : #   ::!::!!1001010!:!11!!::   #
+# :---------------------::---------------------: #   :!1!!11000000000011!!:    #
+# : License - MIT       :: Update - 2026/09/18 : #    ::::!!!1!!1!!!1!!!::     #
+# +.....................++.....................+ #       ::::!::!:::!::::      #
+\******************************************************************************/
 
-CORNER_WARP_RADIUS.USE("GL");
+const	graph = corner_warp_radius.get("graph");
+const	gx = graph.getContext("2d");
+
+corner_warp_radius.use("GL");
 
 function
-	PROFILE(F, INNER, OUTER, CURVE)
+	profile(f, inner, outer, curve)
 {
-	const	BAND = Math.min(1, Math.max(0, (F - INNER) / Math.max(OUTER - INNER, 1E-4)));
+	const	band = Math.min(1, Math.max(0, (f - inner) / Math.max(outer - inner, 1E-4)));
 
-	return (Math.pow(BAND, CURVE));
+	return (Math.pow(band, curve));
 }
 
 function
-	DRAW_GRAPH(INNER, OUTER, CURVE)
+	draw_graph(inner, outer, curve)
 {
-	const	W = GRAPH.width;
-	const	H = GRAPH.height;
-	const	PAD = 6;
+	const	w = graph.width;
+	const	h = graph.height;
+	const	pad = 6;
 
-	GX.clearRect(0, 0, W, H);
-	GX.strokeStyle = "#3D3D3A";
-	GX.lineWidth = 1;
-	GX.strokeRect(PAD, PAD, W - 2 * PAD, H - 2 * PAD);
-	GX.fillStyle = "rgba(57, 199, 224, 0.12)";
+	gx.clearRect(0, 0, w, h);
+	gx.strokeStyle = "#3D3D3A";
+	gx.lineWidth = 1;
+	gx.strokeRect(pad, pad, w - 2 * pad, h - 2 * pad);
+	gx.fillStyle = "rgba(57, 199, 224, 0.12)";
 
-	const	XO = PAD + OUTER * (W - 2 * PAD);
+	const	xo = pad + outer * (w - 2 * pad);
 
-	GX.fillRect(XO, PAD, (W - PAD) - XO, H - 2 * PAD);
-	GX.beginPath();
+	gx.fillRect(xo, pad, (w - pad) - xo, h - 2 * pad);
+	gx.beginPath();
 
-	for (let PX = 0; PX <= W - 2 * PAD; PX++)
+	for (let px = 0; px <= w - 2 * pad; px++)
 	{
-		const	F = PX / (W - 2 * PAD);
-		const	G = PROFILE(F, INNER, OUTER, CURVE);
-		const	X = PAD + PX;
-		const	Y = (H - PAD) - G * (H - 2 * PAD);
+		const	f = px / (w - 2 * pad);
+		const	g = profile(f, inner, outer, curve);
+		const	x = pad + px;
+		const	y = (h - pad) - g * (h - 2 * pad);
 
-		if (PX)
-			GX.lineTo(X, Y);
+		if (px)
+			gx.lineTo(x, y);
 		else
-			GX.moveTo(X, Y);
+			gx.moveTo(x, y);
 	}
 
-	GX.strokeStyle = "#39C7E0";
-	GX.lineWidth = 2;
-	GX.stroke();
-	GX.fillStyle = "#8F8D87";
-	GX.font = "9px ui-monospace, monospace";
-	GX.fillText("centre", PAD + 2, H - PAD - 3);
-	GX.textAlign = "right";
-	GX.fillText("edge", W - PAD - 2, H - PAD - 3);
-	GX.textAlign = "left";
+	gx.strokeStyle = "#39C7E0";
+	gx.lineWidth = 2;
+	gx.stroke();
+	gx.fillStyle = "#8F8D87";
+	gx.font = "9px ui-monospace, monospace";
+	gx.fillText("centre", pad + 2, h - pad - 3);
+	gx.textAlign = "right";
+	gx.fillText("edge", w - pad - 2, h - pad - 3);
+	gx.textAlign = "left";
 }
 
 function
-	DRAW()
+	draw()
 {
-	const	CWR = CORNER_WARP_RADIUS;
-	const	R = +CWR.GET("R").value;
-	const	N = +CWR.GET("N").value;
-	const	S = +CWR.GET("S").value;
-	let		INNER = +CWR.GET("I").value;
-	let		OUTER = +CWR.GET("O").value;
-	let		CURVE = +CWR.GET("C").value;
+	const	cwr = corner_warp_radius;
+	const	r = +cwr.get("r").value;
+	const	n = +cwr.get("n").value;
+	const	s = +cwr.get("s").value;
+	let		inner = +cwr.get("i").value;
+	let		outer = +cwr.get("o").value;
+	let		curve = +cwr.get("c").value;
 
-	if (OUTER <= INNER)
-		OUTER = INNER + 0.001;
+	if (outer <= inner)
+		outer = inner + 0.001;
 
-	CWR.RENDER({R: R, N: N, STRENGTH: S, INNER: INNER, OUTER: OUTER, CURVE: CURVE});
-	CWR.GET("VR").textContent = Math.round(R * 100) + "%";
-	CWR.GET("VN").textContent = N.toFixed(1);
-	CWR.GET("VS").textContent = Math.round(S * 100) + "%";
-	CWR.GET("VI").textContent = Math.round(INNER * 100) + "%";
-	CWR.GET("VO").textContent = Math.round(OUTER * 100) + "%";
+	cwr.render({r: r, n: n, strength: s, inner: inner, outer: outer, curve: curve});
+	cwr.get("vr").textContent = Math.round(r * 100) + "%";
+	cwr.get("vn").textContent = n.toFixed(1);
+	cwr.get("vs").textContent = Math.round(s * 100) + "%";
+	cwr.get("vi").textContent = Math.round(inner * 100) + "%";
+	cwr.get("vo").textContent = Math.round(outer * 100) + "%";
 
-	if (Math.abs(CURVE - 1) < 0.08)
-		CWR.GET("VC").textContent = "linear";
-	else if (CURVE < 1)
-		CWR.GET("VC").textContent = "fast (concave)";
+	if (Math.abs(curve - 1) < 0.08)
+		cwr.get("vc").textContent = "linear";
+	else if (curve < 1)
+		cwr.get("vc").textContent = "fast (concave)";
 	else
-		CWR.GET("VC").textContent = "slow (convex)";
+		cwr.get("vc").textContent = "slow (convex)";
 
-	CWR.GET("CLIPPED").style.borderRadius = (R * 50) + "%";
-	DRAW_GRAPH(INNER, OUTER, CURVE);
+	cwr.get("clipped").style.borderRadius = (r * 50) + "%";
+	draw_graph(inner, outer, curve);
 }
 
 function
-	USE_IMAGE(SOURCE)
+	use_image(source)
 {
-	const	CWR = CORNER_WARP_RADIUS;
+	const	cwr = corner_warp_radius;
 
-	CWR.LOAD(SOURCE);
+	cwr.load(source);
 
-	if (SOURCE.toDataURL)
-		CWR.GET("CLIPPED").src = SOURCE.toDataURL();
+	if (source.toDataURL)
+		cwr.get("clipped").src = source.toDataURL();
 	else
-		CWR.GET("CLIPPED").src = SOURCE.src;
+		cwr.get("clipped").src = source.src;
 
-	DRAW();
+	draw();
 }
 
 function
-	SAMPLE(KIND)
+	sample(kind)
 {
-	const	CANVAS = document.createElement("canvas");
+	const	canvas = document.createElement("canvas");
 
-	CANVAS.width = 900;
-	CANVAS.height = 900;
+	canvas.width = 900;
+	canvas.height = 900;
 
-	const	X = CANVAS.getContext("2d");
+	const	x = canvas.getContext("2d");
 
-	if (KIND === 0)
+	if (kind === 0)
 	{
-		X.fillStyle = "#1D1C1B";
-		X.fillRect(0, 0, 900, 900);
-		X.strokeStyle = "#C2543F";
-		X.lineWidth = 26;
-		X.strokeRect(13, 13, 874, 874);
-		X.strokeStyle = "#5A4A7A";
-		X.lineWidth = 8;
-		X.strokeRect(60, 60, 780, 780);
-		X.fillStyle = "#C2543F";
-		X.font = "700 92px ui-monospace, monospace";
-		X.textAlign = "center";
-		X.fillText("CORNERS", 450, 430);
-		X.font = "600 40px ui-monospace, monospace";
-		X.fillStyle = "#8A7FB0";
-		X.fillText("KEEP THE FRAME", 450, 500);
+		x.fillStyle = "#1D1C1B";
+		x.fillRect(0, 0, 900, 900);
+		x.strokeStyle = "#C2543F";
+		x.lineWidth = 26;
+		x.strokeRect(13, 13, 874, 874);
+		x.strokeStyle = "#5A4A7A";
+		x.lineWidth = 8;
+		x.strokeRect(60, 60, 780, 780);
+		x.fillStyle = "#C2543F";
+		x.font = "700 92px ui-monospace, monospace";
+		x.textAlign = "center";
+		x.fillText("CORNERS", 450, 430);
+		x.font = "600 40px ui-monospace, monospace";
+		x.fillStyle = "#8A7FB0";
+		x.fillText("KEEP THE FRAME", 450, 500);
 		['↖', '↗', '↙', '↘'].forEach(
-			function (G, INDEX)
+			function(g, index)
 			{
-				X.font = "700 56px serif";
-				X.fillStyle = "#E8E6E1";
+				x.font = "700 56px serif";
+				x.fillStyle = "#E8E6E1";
 
-				if (INDEX % 2)
+				if (index % 2)
 				{
-					if (INDEX < 2)
-						X.fillText(G, 820, 100);
+					if (index < 2)
+						x.fillText(g, 820, 100);
 					else
-						X.fillText(G, 820, 850);
+						x.fillText(g, 820, 850);
 				}
 				else
 				{
-					if (INDEX < 2)
-						X.fillText(G, 80, 100);
+					if (index < 2)
+						x.fillText(g, 80, 100);
 					else
-						X.fillText(G, 80, 850);
+						x.fillText(g, 80, 850);
 				}
 			}
 		);
 	}
-	else if (KIND === 1)
+	else if (kind === 1)
 	{
-		X.fillStyle = "#101A1E";
-		X.fillRect(0, 0, 900, 900);
-		X.strokeStyle = "#39C7E0";
-		X.lineWidth = 2;
+		x.fillStyle = "#101A1E";
+		x.fillRect(0, 0, 900, 900);
+		x.strokeStyle = "#39C7E0";
+		x.lineWidth = 2;
 
-		for (let INDEX = 0; INDEX <= 18; INDEX++)
+		for (let index = 0; index <= 18; index++)
 		{
-			const	P = INDEX * 50;
+			const	p = index * 50;
 
-			X.beginPath();
-			X.moveTo(P, 0);
-			X.lineTo(P, 900);
-			X.moveTo(0, P);
-			X.lineTo(900, P);
-			X.stroke();
+			x.beginPath();
+			x.moveTo(p, 0);
+			x.lineTo(p, 900);
+			x.moveTo(0, p);
+			x.lineTo(900, p);
+			x.stroke();
 		}
 
-		X.strokeStyle = "#FFF";
-		X.lineWidth = 10;
-		X.strokeRect(5, 5, 890, 890);
+		x.strokeStyle = "#FFF";
+		x.lineWidth = 10;
+		x.strokeRect(5, 5, 890, 890);
 	}
 	else
 	{
-		const	G = X.createLinearGradient(0, 0, 900, 900);
+		const	g = x.createLinearGradient(0, 0, 900, 900);
 
-		G.addColorStop(0.0, "#7FC6E8");
-		G.addColorStop(0.5, "#E9DFD0");
-		G.addColorStop(1.0, "#C98A6A");
-		X.fillStyle = G;
-		X.fillRect(0, 0, 900, 900);
+		g.addColorStop(0.0, "#7FC6E8");
+		g.addColorStop(0.5, "#E9DFD0");
+		g.addColorStop(1.0, "#C98A6A");
+		x.fillStyle = g;
+		x.fillRect(0, 0, 900, 900);
 
 		for (let _ = 0; _ < 300; _++)
 		{
-			X.fillStyle = "rgba(255, 255, 255, " + (Math.random() * 0.35) + ")";
-			X.beginPath();
-			X.arc(Math.random() * 900, Math.random() * 900, Math.random() * 6, 0, 7);
-			X.fill();
+			x.fillStyle = "rgba(255, 255, 255, " + (Math.random() * 0.35) + ")";
+			x.beginPath();
+			x.arc(Math.random() * 900, Math.random() * 900, Math.random() * 6, 0, 7);
+			x.fill();
 		}
 
-		X.fillStyle = "#FFF";
-		X.fillRect(0, 0, 900, 52);
-		X.fillRect(0, 848, 900, 52);
-		X.fillRect(0, 0, 52, 900);
-		X.fillRect(848, 0, 52, 900);
+		x.fillStyle = "#FFF";
+		x.fillRect(0, 0, 900, 52);
+		x.fillRect(0, 848, 900, 52);
+		x.fillRect(0, 0, 52, 900);
+		x.fillRect(848, 0, 52, 900);
 	}
 
-	return (CANVAS);
+	return (canvas);
 }
 
 function
-	AUTO_FIT()
+	auto_fit()
 {
-	const	RESOURCE = CORNER_WARP_RADIUS.DETECT_BORDER_INSET();
-	const	STATUS = CORNER_WARP_RADIUS.GET("status");
+	const	resource = corner_warp_radius.detect_border_inset();
+	const	status = corner_warp_radius.get("status");
 
-	if (!RESOURCE || RESOURCE.THIN)
+	if (!resource || resource.thin)
 	{
-		CORNER_WARP_RADIUS.GET("I").value = 0.85;
-		CORNER_WARP_RADIUS.GET("O").value = 0.85;
-		CORNER_WARP_RADIUS.GET("C").value = 0.25;
-		STATUS.className = "status warn";
-		STATUS.textContent = "No clear frame found - using a default ~15% band. Nudge Band inner edge to taste.";
+		corner_warp_radius.get("i").value = 0.85;
+		corner_warp_radius.get("o").value = 0.85;
+		corner_warp_radius.get("c").value = 0.25;
+		status.className = "status warn";
+		status.textContent = "No clear frame found - using a default ~15% band. Nudge Band inner edge to taste.";
 	}
 	else
 	{
-		const	INNER = Math.min(0.985, Math.max(0.02, RESOURCE.INNER));
+		const	inner = Math.min(0.985, Math.max(0.02, resource.inner));
 
-		CORNER_WARP_RADIUS.GET("I").value = INNER.toFixed(3);
-		CORNER_WARP_RADIUS.GET("O").value = INNER.toFixed(3);
-		CORNER_WARP_RADIUS.GET("C").value = 0.25;
-		STATUS.className = "status";
-		STATUS.textContent =
-			"Frame ≈ " + Math.round(RESOURCE.W * 100) + "% thick → band set to " +
-			Math.round(INNER * 100) + "%. Warp is confined to that ring.";
+		corner_warp_radius.get("i").value = inner.toFixed(3);
+		corner_warp_radius.get("o").value = inner.toFixed(3);
+		corner_warp_radius.get("c").value = 0.25;
+		status.className = "status";
+		status.textContent =
+			"Frame ≈ " + Math.round(resource.w * 100) + "% thick → band set to " +
+			Math.round(inner * 100) + "%. Warp is confined to that ring.";
 	}
 
-	DRAW();
+	draw();
 }
 
-['R', 'N', 'S', 'I', 'O', 'C'].forEach(
-	function (ID)
+['r', 'n', 's', 'i', 'o', 'c'].forEach(
+	function(id)
 	{
-		return (CORNER_WARP_RADIUS.GET(ID).addEventListener("input", DRAW));
+		return (corner_warp_radius.get(id).addEventListener("input", draw));
 	}
 );
 
 document.querySelectorAll("[data-img]").forEach(
-	function (B)
+	function(b)
 	{
-		return (B.addEventListener("click", () => USE_IMAGE(SAMPLE(+B.dataset.img))));
+		return (
+			b.addEventListener(
+				"click",
+				function()
+				{
+					return (use_image(sample(+b.dataset.img)));
+				}
+			)
+		);
 	}
 );
 
-CORNER_WARP_RADIUS.GET("FILE").addEventListener("change", EVENT => {
-	const	FILE = EVENT.target.files[0];
+corner_warp_radius.get("file").addEventListener(
+	"change",
+	function(event)
+	{
+		const	file = event.target.files[0];
 
-	if (!FILE)
-		return ;
+		if (!file)
+			return ;
 
-	const	THE_IMAGE = new Image();
+		const	the_image = new Image();
 
-	THE_IMAGE.onload = (
-		function ()
-		{
-			USE_IMAGE(THE_IMAGE);
-		}
-	);
-	THE_IMAGE.src = URL.createObjectURL(FILE);
-});
+		the_image.onload = (
+			function ()
+			{
+				use_image(the_image);
+			}
+		);
+		the_image.src = URL.createObjectURL(file);
+	}
+);
 
-CORNER_WARP_RADIUS.GET("AUTO_FIT").addEventListener("click", AUTO_FIT);
+corner_warp_radius.get("auto_fit").addEventListener("click", auto_fit);
 
-USE_IMAGE(SAMPLE(0));
+use_image(sample(0));

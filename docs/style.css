@@ -1,23 +1,42 @@
-:root{
-	   --bg:#232322;
-	--panel:#2c2c2a;
-	 --line:#3d3d3a;
-	  --ink:#e8e6e1;
-	  --dim:#8f8d87;
-	  --hot:#39c7e0;
+/******************************************************************************\
+# CSS - style                                    #       Maximum Tension       #
+################################################################################
+#                                                #      -__            __-     #
+# Teoman Deniz                                   #  :    :!1!-_    _-!1!:    : #
+# maximum-tension.com                            #  ::                      :: #
+#                                                #  :!:    : :: : :  :  ::::!: #
+# +.....................++.....................+ #   :!:: :!:!1:!:!::1:::!!!:  #
+# : C - Maximum Tension :: Create - 2026/07/12 : #   ::!::!!1001010!:!11!!::   #
+# :---------------------::---------------------: #   :!1!!11000000000011!!:    #
+# : License - MIT       :: Update - 2026/09/18 : #    ::::!!!1!!1!!!1!!!::     #
+# +.....................++.....................+ #       ::::!::!:::!::::      #
+\******************************************************************************/
+
+:root
+{
+	   --bg: #232322;
+	  --ink: #E8E6E1;
+	  --dim: #8F8D87;
+	  --hot: #39C7E0;
+	 --line: #3D3D3A;
+	--panel: #2C2C2A;
 }
 
 *
 {
-	box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	   -moz-box-sizing: border-box;
+	        box-sizing: border-box;
 }
 
 body
 {
 	      font: 14px / 1.5 ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+	     color: #E8E6E1; /* FALLBACK */
 	     color: var(--ink);
 	    margin: 0;
 	   padding: 32px 24px 64px;
+	background: #232322; /* FALLBACK */
 	background: var(--bg);
 }
 
@@ -32,6 +51,7 @@ h1
 
 .sub
 {
+	    color: #8F8D87; /* FALLBACK */
 	    color: var(--dim);
 	   margin: 0 0 28px;
 	max-width: 64ch;
@@ -39,29 +59,60 @@ h1
 
 .wrap
 {
-	        gap: 32px;
-	    display: flex;
-	  flex-wrap: wrap;
-	align-items: flex-start;
+	                gap: 32px;
+	            display: -webkit-box;
+	            display: -webkit-flex;
+	            display: -moz-box;
+	            display: -ms-flexbox;
+	            display: flex;
+
+	  -webkit-flex-wrap: wrap;
+	      -ms-flex-wrap: wrap;
+	          flex-wrap: wrap;
+
+	  -webkit-box-align: start;
+	-webkit-align-items: flex-start;
+	     -moz-box-align: start;
+	     -ms-flex-align: start;
+	        align-items: flex-start;
 }
 
 .stage
 {
-	      gap: 24px;
-	  display: flex;
-	flex-wrap: wrap;
+	              gap: 24px;
+	          display: -webkit-box;
+	          display: -webkit-flex;
+	          display: -moz-box;
+	          display: -ms-flexbox;
+	          display: flex;
+
+	-webkit-flex-wrap: wrap;
+	    -ms-flex-wrap: wrap;
+	        flex-wrap: wrap;
 }
 
 figure
 {
-	           gap: 10px;
-	        margin: 0;
-	       display: flex;
-	flex-direction: column;
+	                   gap: 10px;
+	                margin: 0;
+	               display: -webkit-box;
+	               display: -webkit-flex;
+	               display: -moz-box;
+	               display: -ms-flexbox;
+	               display: flex;
+
+	    -webkit-box-orient: vertical;
+	 -webkit-box-direction: normal;
+	-webkit-flex-direction: column;
+	       -moz-box-orient: vertical;
+	    -moz-box-direction: normal;
+	    -ms-flex-direction: column;
+	        flex-direction: column;
 }
 
 figcaption
 {
+	         color: #8F8D87; /* FALLBACK */
 	         color: var(--dim);
 	     font-size: 11px;
 	letter-spacing: 0.08em;
@@ -77,9 +128,10 @@ figcaption
 	background: #111;
 }
 
-#CLIPPED
+#clipped
 {
-	object-fit: cover;
+	-o-object-fit: cover;
+	   object-fit: cover;
 }
 
 #GL
@@ -89,53 +141,99 @@ figcaption
 
 .panel
 {
-	           gap: 16px;
-	         width: 300px;
-	       display: flex;
-	       padding: 18px;
-	    background: var(--panel); border:1px solid var(--line);
-	flex-direction: column;
+	                   gap: 16px;
+	                 width: 300px;
+	                border: 1px solid #3D3D3A; /* FALLBACK */
+	                border: 1px solid var(--line);
+	               display: -webkit-box;
+	               display: -webkit-flex;
+	               display: -moz-box;
+	               display: -ms-flexbox;
+	               display: flex;
+	               padding: 18px;
+	            background: #2C2C2A; /* FALLBACK */
+	            background: var(--panel);
+
+	    -webkit-box-orient: vertical;
+	 -webkit-box-direction: normal;
+	-webkit-flex-direction: column;
+	       -moz-box-orient: vertical;
+	    -moz-box-direction: normal;
+	    -ms-flex-direction: column;
+	        flex-direction: column;
 }
 
 label
 {
-	           gap: 6px;
-	         color: var(--dim);
-	       display: flex;
-	     font-size: 11px;
-	flex-direction: column;
-	letter-spacing: 0.06em;
-	text-transform: uppercase;
+	                   gap: 6px;
+	                 color: #8F8D87; /* FALLBACK */
+	                 color: var(--dim);
+	               display: -webkit-box;
+	               display: -webkit-flex;
+	               display: -moz-box;
+	               display: -ms-flexbox;
+	               display: flex;
+	             font-size: 11px;
+	        letter-spacing: 0.06em;
+	        text-transform: uppercase;
+
+	    -webkit-box-orient: vertical;
+	 -webkit-box-direction: normal;
+	-webkit-flex-direction: column;
+	       -moz-box-orient: vertical;
+	    -moz-box-direction: normal;
+	    -ms-flex-direction: column;
+	        flex-direction: column;
 }
 
 .row
 {
-	        display: flex;
-	justify-content: space-between;
+	                display: -webkit-box;
+	                display: -webkit-flex;
+	                display: -moz-box;
+	                display: -ms-flexbox;
+	                display: flex;
+
+	       -webkit-box-pack: justify;
+	-webkit-justify-content: space-between;
+	          -moz-box-pack: justify;
+	          -ms-flex-pack: justify;
+	        justify-content: space-between;
 }
 
 .val
 {
+	color: #E8E6E1; /* FALLBACK */
 	color: var(--ink);
 }
 
 input[type=range]
 {
-	       width:100%;
+	       width: 100%;
+	accent-color: #39C7E0; /* FALLBACK */
 	accent-color: var(--hot);
 }
 
 .imgs
 {
-	      gap: 8px;
-	  display: flex;
-	flex-wrap: wrap;
+	              gap: 8px;
+	          display: -webkit-box;
+	          display: -webkit-flex;
+	          display: -moz-box;
+	          display: -ms-flexbox;
+	          display: flex;
+
+	-webkit-flex-wrap: wrap;
+	    -ms-flex-wrap: wrap;
+	        flex-wrap: wrap;
 }
 
 button
 {
 	      font: inherit;
+	     color: #E8E6E1; /* FALLBACK */
 	     color: var(--ink);
+	    border: 1px solid #3D3D3A; /* FALLBACK */
 	    border: 1px solid var(--line);
 	    cursor: pointer;
 	   padding: 7px 10px;
@@ -145,47 +243,56 @@ button
 
 button:hover
 {
+	       color: #39C7E0; /* FALLBACK */
 	       color: var(--hot);
+	border-color: #39C7E0; /* FALLBACK */
 	border-color: var(--hot);
 }
 
 button:focus-visible
 {
+	       outline: 2px solid #39C7E0; /* FALLBACK */
 	       outline: 2px solid var(--hot);
 	outline-offset: 2px;
 }
 
 input[type=file]
 {
+	    color: #8F8D87; /* FALLBACK */
 	    color: var(--dim);
 	    width: 100%;
 	font-size: 11px;
 }
 
-#GRAPH
+#graph
 {
 	     width: 100%;
+	    border: 1px solid #3D3D3A; /* FALLBACK */
 	    border: 1px solid var(--line);
 	    height: auto;
-	background:#232322;
+	background: #232322;
 }
 
-#AUTO_FIT
+#auto_fit
 {
+	       color: #39C7E0; /* FALLBACK */
 	       color: var(--hot);
 	     padding: 9px;
 	   font-size: 12px;
+	border-color: #39C7E0; /* FALLBACK */
 	border-color: var(--hot);
 }
 
-#AUTO_FIT:hover
+#auto_fit:hover
 {
 	     color: #111;
+	background: #39C7E0; /* FALLBACK */
 	background: var(--hot);
 }
 
 .status
 {
+	      color: #8F8D87; /* FALLBACK */
 	      color: var(--dim);
 	     margin: 0;
 	  font-size: 11px;
@@ -199,8 +306,10 @@ input[type=file]
 
 .note
 {
+	      color: #8F8D87; /* FALLBACK */
 	      color: var(--dim);
 	  font-size: 11px;
+	 border-top: 1px solid #3D3D3A; /* FALLBACK */
 	 border-top: 1px solid var(--line);
 	line-height: 1.6;
 	padding-top: 14px;
