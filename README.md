@@ -43,12 +43,12 @@ A **band profile** decides how much of that compression to apply at each radius,
 
 ```
 g = pow( clamp((f - inner) / (outer - inner), 0, 1), curve )
-scale = mix(1, 1 + (t_square/t_round - 1) * G, strength)
+scale = mix(1, 1 + (t_square/t_round - 1) * g, strength)
 ```
 
 - `f < inner` -> `g = 0` -> identity (interior untouched)
 - `f > outer` -> `g = 1` -> full warp held flat to the edge (the *plateau*)
-- between them -> a ramp shaped by `CURVE` (`<1` concave, `1` linear, `>1` convex)
+- between them -> a ramp shaped by `curve` (`<1` concave, `1` linear, `>1` convex)
 
 The corner shape itself is an **n-norm**: `n = 2` gives circular arcs, `n ≈ 4` an iOS-style squircle, higher `n` a squarer corner. The rounded edge is anti-aliased against the SDF, and output is premultiplied alpha so it composites cleanly over any background.
 
