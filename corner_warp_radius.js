@@ -303,3 +303,8 @@ const	corner_warp_radius = {
 		cwr.gl.drawArrays(cwr.gl.TRIANGLES, 0, 3);
 	}
 };
+
+if (typeof(module) === "object" && module.exports)
+	module.exports = corner_warp_radius;
+
+(typeof(globalThis) !== "undefined" ? globalThis : this).corner_warp_radius = corner_warp_radius;

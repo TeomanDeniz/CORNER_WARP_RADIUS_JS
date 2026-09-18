@@ -1,0 +1,23 @@
+{
+	"name": "corner_warp_radius",
+	"version": "1.0.0",
+	"description": "Rounds the corners of square artwork without clipping it, by warping the image into the rounded shape in a WebGL shader.",
+	"author": "Teoman Deniz",
+	"license": "MIT",
+	"homepage": "https://teomandeniz.github.io/corner_warp_radius/",
+	"main": "corner_warp_radius.js",
+	"module": "corner_warp_radius.mjs",
+	"exports":
+	{
+		".":
+		{
+			"import": "./corner_warp_radius.mjs",
+			"require": "./corner_warp_radius.js",
+			"default": "./corner_warp_radius.js"
+		}
+	},
+	"repository": {"type": "git", "url": "git+https://github.com/TeomanDeniz/corner_warp_radius.git"},
+	"files": ["corner_warp_radius.js", "corner_warp_radius.mjs", "corner_warp_radius.min.js", "corner_warp_radius.min.js.map", "README.md", "LICENSE"],
+	"keywords": ["webgl", "border-radius", "squircle", "shader", "corner", "warp"],
+	"sideEffects": true
+}
