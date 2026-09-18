@@ -1,4 +1,4 @@
-# CORNER_WARP_RADIUS
+# corner_warp_radius
 
 <p align="center">
  <a href="https://teomandeniz.github.io/corner_warp_radius/"><img src="https://img.shields.io/badge/Live_Demo-Open-2F5BFF?style=for-the-badge" alt="Live Demo"/></a>
